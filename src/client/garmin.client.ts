@@ -1,4 +1,6 @@
 import { GarminAuth, type RequestOptions } from './garmin-auth';
+import { buildStrengthWorkoutPayload } from './workout-builder';
+import type { StrengthExerciseDto } from '../dtos';
 import {
   USER_SUMMARY_ENDPOINT,
   HEART_RATE_ENDPOINT,
@@ -749,5 +751,29 @@ export class GarminClient {
       `${GEAR_UNLINK_ENDPOINT}/${gearUuid}/activity/${activityId}`,
       { method: 'PUT' },
     );
+  }
+
+  async createStrengthWorkout(
+    name: string,
+    exercises: StrengthExerciseDto[],
+    description?: string,
+  ): Promise<unknown> {
+    return this.request(WORKOUT_ENDPOINT, {
+      method: 'POST',
+      body: buildStrengthWorkoutPayload(name, exercises, description),
+    });
+  }
+
+  async scheduleWorkout(workoutId: number, date: string): Promise<unknown> {
+    return this.request(`${SCHEDULED_WORKOUT_ENDPOINT}/${workoutId}`, {
+      method: 'POST',
+      body: { date },
+    });
+  }
+
+  async deleteWorkout(workoutId: number): Promise<unknown> {
+    return this.request(`${WORKOUT_ENDPOINT}/${workoutId}`, {
+      method: 'DELETE',
+    });
   }
 }
